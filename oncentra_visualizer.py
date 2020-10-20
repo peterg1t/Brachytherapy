@@ -49,6 +49,7 @@ import matplotlib.pyplot as plt
 import oncdose
 import oncplan
 import oncstruct
+import oncimg
 
 os.environ["ETS_TOOLKIT"] = "qt4"
 
@@ -75,6 +76,18 @@ parser.add_argument(
     nargs="?",
     type=argparse.FileType("r"),
     help="dose file, in DICOM format",
+)
+parser.add_argument(
+    "-if",
+    "--file",
+    nargs="?",
+    type=argparse.FileType("r"),
+    help="image file, in DICOM format",
+)
+parser.add_argument(
+    "-id",
+    "--directory",
+    help="image directory, in DICOM format",
 )
 args = parser.parse_args()
 
@@ -109,6 +122,25 @@ if args.dose:
     # mlab.contour3d(x,y,z,volume,contours=15,opacity=1)
     mlab.colorbar(title="Dose [cGy]", orientation="vertical")
 
+
+if args.file:
+    filename = args.file
+    print(filename.name)
+    x, y, z, dx, dy, dz, volume = oncimg.process_file(filename.name)
+    # using mayavi
+
+    mlab.volume_slice(x, y, z, volume, plane_orientation="z_axes")
+    # mlab.contour3d(x,y,z,volume,contours=15,opacity=1)
+    mlab.colorbar(title="Pixel amplitude [a.u.]", orientation="vertical")
+
+if args.directory:
+    dirname = args.directory
+    print(dirname)
+    x, y, z, dx, dy, dz, volume = oncimg.process_directory(dirname)
+    # using mayavi
+    mlab.volume_slice(x, y, z, volume, plane_orientation="z_axes")
+    # mlab.contour3d(x,y,z,volume,contours=15,opacity=1)
+    mlab.colorbar(title="Pixel amplitude [a.u.]", orientation="vertical")
 
 if args.plan:
     planname = args.plan

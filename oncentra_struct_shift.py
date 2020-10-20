@@ -47,13 +47,6 @@ def process_struct(filename, meas_params, dirname, structname_o):
         except ValueError:  # pylint: disable = bare-except
             print("Please enter a valid option:")
 
-    # struct_sel_name = dataset[0x3006, 0x0020][num1][0x3006, 0x0028].value
-
-    dz = abs(
-        dataset[0x3006, 0x0039][num1][0x3006, 0x0040][2][0x3006, 0x0050][2]
-        - dataset[0x3006, 0x0039][num1][0x3006, 0x0040][1][0x3006, 0x0050][2]
-    )
-    print("dz=", dz)
     print(meas_params)
 
     elem = dataset[0x3006, 0x0039][num1]
@@ -64,7 +57,7 @@ def process_struct(filename, meas_params, dirname, structname_o):
         ]:  # the area between the two surfaces must be calculated for every contour if there are two areas in each of the contours
             for i in range(0, contour[0x3006, 0x0050].VM, 3):
                 contour[0x3006, 0x0050].value[i] = (
-                    contour[0x3006, 0x0050].value[i] + meas_params[0]
+                    contour[0x3006, 0x0050].value[i] + meas_params[0]#
                 )
                 contour[0x3006, 0x0050].value[i + 1] = (
                     contour[0x3006, 0x0050].value[i + 1] + meas_params[1]
@@ -85,11 +78,17 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # parser.add_argument('-s', '--structure', nargs='?', type=argparse.FileType('r'), help='structure file, in DICOM format')
     parser.add_argument("structure", type=str, help="Input the structure file")
+    #parser.add_argument(
+    #    "-o",
+    #    "--output",
+    #    nargs="?",
+    #    type=argparse.FileType("w"),
+    #    help="output structure filename, the file will be located in the same folder as the original, in DICOM format",
+    #)
     parser.add_argument(
         "-o",
         "--output",
-        nargs="?",
-        type=argparse.FileType("w"),
+        type=str,
         help="output structure filename, the file will be located in the same folder as the original, in DICOM format",
     )
     parser.add_argument(
@@ -97,13 +96,14 @@ if __name__ == "__main__":
         "--measurement",
         nargs=3,
         metavar=("x", "y", "z"),
-        help="Specify the shift in x, y, z in mm",
+        help="Specify the shift in x, y, z in mm",#
         type=float,
         default=[0, 0, 0],
     )
     args = parser.parse_args()
 
     mp = args.measurement
+    sname_o=args.output
 
     # f = plt.figure()
     # ax = f.add_subplot(111, projection="3d")
@@ -116,6 +116,6 @@ if __name__ == "__main__":
         dname = os.path.dirname(sname)
         if args.output:
             sname_o = args.output
-            process_struct(sname, mp, dname, sname_o.name)
+            process_struct(sname, mp, dname, sname_o)
         else:
             process_struct(sname, mp, dname, None)

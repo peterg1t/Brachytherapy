@@ -2,7 +2,7 @@
 #
 #   Script name: Oncentra_FDR
 #
-#   Description: Tool for calculating the radial distribution function with respect to a position in the volume
+#   Description: Tool for calculating the radial distribution function of sources with respect to a position in the volume
 #
 #   Example usage: python Oncentra_FDR.py "/file/"
 #

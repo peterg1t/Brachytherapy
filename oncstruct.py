@@ -40,12 +40,12 @@ def process_file(filename):
     color = []
     layer = []
 
-    for item in dataset[0x3006, 0x0080]:
+    for item in dataset[0x3006, 0x0020]:
         desc_item.append(
             (
-                int(item[0x3006, 0x0084].value),
+                int(item[0x3006, 0x0022].value),
                 #item[0x3006, 0x0088].value,
-                item[0x3006, 0x00A4].value,
+                item[0x3006, 0x0026].value,
             )
         )
 
@@ -64,6 +64,9 @@ def process_file(filename):
         kk = 0
         try:
             for contour in elem[0x3006, 0x0040]:
+                xs_sl = []
+                ys_sl = []
+                zs_sl = []
                 for i in range(0, contour[0x3006, 0x0050].VM, 3):
                     xs_tot.append(contour[0x3006, 0x0050][i])
                     ys_tot.append(contour[0x3006, 0x0050][i + 1])
@@ -71,11 +74,17 @@ def process_file(filename):
                     xs_el.append(contour[0x3006, 0x0050][i])
                     ys_el.append(contour[0x3006, 0x0050][i + 1])
                     zs_el.append(contour[0x3006, 0x0050][i + 2])
+                    xs_sl.append(contour[0x3006, 0x0050][i])
+                    ys_sl.append(contour[0x3006, 0x0050][i + 1])
+                    zs_sl.append(contour[0x3006, 0x0050][i + 2])
                     color.append(roi_color)
                     element.append(desc_item[k, :])
                     layer.append(kk)
                     # print('kk=',kk)
                 kk = kk + 1
+                print('slice=',kk,'x_ave=', np.average(xs_sl))
+                print('slice=',kk,'y_ave=', np.average(ys_sl))
+                print('slice=',kk,'z_ave=', np.average(zs_sl))
 
             # #using matplotlib3d
             # verts = [list(zip(xs_el, ys_el, zs_el))]
@@ -110,7 +119,8 @@ def process_file(filename):
 
             if ioption.startswith(("y", "yeah", "yes")):
                 elem = np.transpose(np.vstack((xs_el,ys_el,zs_el)))
-                with open(dirname+"/"+file[0]+"_struct"+str(k)+".csv","w+") as my_csv:            # writing the file as my_csv
+                with open(dirname+"/"+file[0]+"_"+str(desc_item[k,1])+".csv","w+") as my_csv:            # writing the file as my_csv
+                #with open(dirname+"/"+file[0]+"_struct"+str(k)+".csv","w+") as my_csv:            # writing the file as my_csv
                     csvWriter = csv.writer(my_csv,delimiter=',')  # using the csv module to write the file
                     csvWriter.writerow(['x','y','z'])
                     csvWriter.writerows(elem)

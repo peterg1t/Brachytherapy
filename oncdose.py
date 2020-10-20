@@ -25,7 +25,6 @@ def process_file(filename):
     """This function process an Oncentra dose file  """
     # print('Starting dose calculation')
     dataset = pydicom.dcmread(filename)
-    # print(dataset)
     array_dicom = np.zeros(
         (dataset.Rows, dataset.Columns, 0), dtype=dataset.pixel_array.dtype
     )
@@ -48,5 +47,6 @@ def process_file(filename):
     volume = np.flip(
         np.swapaxes(array_dicom, axis1=0, axis2=2), axis=2
     )  # need to swap two axis and flip z since the axis must be increasing
+    volume = np.swapaxes(volume, axis1=0, axis2=1)
 
     return x, y, z, dx, dy, dz, volume
