@@ -78,7 +78,7 @@ def multi_slice_viewer_axial(volume):
 
 
 
-def process_file(planname,regname,outname):
+def process_file(planname,regname,outname,proc_key):
     dataset = pydicom.dcmread(regname, force=True)
 
     #Rigid registration
@@ -97,7 +97,11 @@ def process_file(planname,regname,outname):
             x, y, z = pos[0x300A, 0x02D4].value
             print(pos[0x300A, 0x02D4].value)
             B=np.asarray([x,y,z,1])
-            A = np.matmul(Minv,B)
+            if proc_key==1:
+                A = np.matmul(Minv,B)
+            else:
+                A = np.matmul(B,M)
+
             pos[0x300A, 0x02D4].value = [A[0],A[1],A[2]]
             print(pos[0x300A, 0x02D4].value)
 
@@ -192,9 +196,11 @@ def process_file(planname,regname,outname):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--plan", help="path to plan file")
-    parser.add_argument("-r", "--registration", help="path to plan file")
+    requiredNamed = parser.add_argument_group('required arguments')
+    requiredNamed.add_argument("-p", "--plan", help="path to plan file",required=True)
+    requiredNamed.add_argument("-r", "--registration", help="path to plan file",required=True)
     parser.add_argument("-o","--output",type=str,help="output plan file name, the file will be located in the same folder as the original, in DICOM format")
+    parser.add_argument("-i","--inverse",help="if this key is enabled the inverse transform is applied to the plan")
     args = parser.parse_args()  # pylint: disable = invalid-name
 
     # while True:  # example of infinite loops using try and except to catch only numbers
@@ -215,9 +221,16 @@ if __name__ == "__main__":
         regname = args.registration  # pylint: disable = invalid-name
         if args.output:
             outf = args.output
-            process_file(planname, regname, outf)
+            if args.inverse:
+                process_file(planname, regname, outf, 1)
+            else:
+                process_file(planname, regname, outf, 0)
+
         else:
-            process_file(planname, regname, None)
+            if args.inverse:
+                process_file(planname, regname, None,1)
+            else:
+                process_file(planname, regname, None,0)
 
 
 
