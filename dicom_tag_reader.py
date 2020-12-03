@@ -30,7 +30,7 @@ def process_dicom(filename):
 
 
 parser = argparse.ArgumentParser() #pylint: disable = invalid-name
-parser.add_argument('-f', '--filename', help='path to file')
+parser.add_argument('filename', help='path to file')
 args = parser.parse_args() #pylint: disable = invalid-name
 
 if args.filename:

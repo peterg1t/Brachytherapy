@@ -200,7 +200,7 @@ if __name__ == "__main__":
     requiredNamed.add_argument("-p", "--plan", help="path to plan file",required=True)
     requiredNamed.add_argument("-r", "--registration", help="path to plan file",required=True)
     parser.add_argument("-o","--output",type=str,help="output plan file name, the file will be located in the same folder as the original, in DICOM format")
-    parser.add_argument("-i","--inverse",help="if this key is enabled the inverse transform is applied to the plan")
+    parser.add_argument("-i","--inverse",help="if this key is enabled the inverse transform is applied to the plan",action='store_true')
     args = parser.parse_args()  # pylint: disable = invalid-name
 
     # while True:  # example of infinite loops using try and except to catch only numbers
@@ -228,9 +228,9 @@ if __name__ == "__main__":
 
         else:
             if args.inverse:
-                process_file(planname, regname, None,1)
+                process_file(planname, regname, None, 1)
             else:
-                process_file(planname, regname, None,0)
+                process_file(planname, regname, None, 0)
 
 
 

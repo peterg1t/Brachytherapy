@@ -1,7 +1,7 @@
 """
-Script name: oncstruct
+Script name: oncstruct_batch
 
-Description: Tool for processing of Oncentra structure files
+Description: Tool for batch processing of Oncentra structure files will output all PTV files to .csv
 
 Author: Pedro Martinez
 pedro.enrique.83@gmail.com
@@ -40,12 +40,12 @@ def process_file(filename):
     color = []
     layer = []
 
-    for item in dataset[0x3006, 0x0020]:
+    for item in dataset[0x3006, 0x0080]:
         desc_item.append(
             (
-                int(item[0x3006, 0x0022].value),
+                int(item[0x3006, 0x0084].value),
                 #item[0x3006, 0x0088].value,
-                item[0x3006, 0x0026].value,
+                item[0x3006, 0x00A4].value,
             )
         )
 
@@ -59,14 +59,11 @@ def process_file(filename):
         roi_color = np.asarray(elem[0x3006, 0x002A].value)
         # print(roi_color/255,np.shape(roi_color))
         # exit(0)
-        #hex_color = colors.rgb2hex(np.asarray(roi_color) / 255)
+        hex_color = colors.rgb2hex(np.asarray(roi_color) / 255)
         roi_num.append(elem[0x3006, 0x0084].value)
         kk = 0
         try:
             for contour in elem[0x3006, 0x0040]:
-                xs_sl = []
-                ys_sl = []
-                zs_sl = []
                 for i in range(0, contour[0x3006, 0x0050].VM, 3):
                     xs_tot.append(contour[0x3006, 0x0050][i])
                     ys_tot.append(contour[0x3006, 0x0050][i + 1])
@@ -74,17 +71,11 @@ def process_file(filename):
                     xs_el.append(contour[0x3006, 0x0050][i])
                     ys_el.append(contour[0x3006, 0x0050][i + 1])
                     zs_el.append(contour[0x3006, 0x0050][i + 2])
-                    xs_sl.append(contour[0x3006, 0x0050][i])
-                    ys_sl.append(contour[0x3006, 0x0050][i + 1])
-                    zs_sl.append(contour[0x3006, 0x0050][i + 2])
                     color.append(roi_color)
                     element.append(desc_item[k, :])
                     layer.append(kk)
                     # print('kk=',kk)
                 kk = kk + 1
-                print('slice=',kk,'x_ave=', np.average(xs_sl))
-                print('slice=',kk,'y_ave=', np.average(ys_sl))
-                print('slice=',kk,'z_ave=', np.average(zs_sl))
 
             # #using matplotlib3d
             # verts = [list(zip(xs_el, ys_el, zs_el))]
@@ -104,23 +95,23 @@ def process_file(filename):
             print('z_ave=',np.average(zs_el))
 
 
-            # Do you you want to save csv files of every structure in the dicom file
-            while True:  # example of infinite loops using try and except to catch only numbers
-                line = input("Do you you want to save csv files of structure "+str(desc_item[k, :])+" in the dicom file? [yes(y)/no(n)]> ")
-                try:
-                    ##        if line == 'done':
-                    ##            break
-                    ioption = str(line.lower())
-                    if ioption.startswith(("y", "yeah", "yes", "n", "no", "nope")):
-                        break
-
-                except:  # pylint: disable = bare-except
-                    print("Please enter a valid option:")
-
-            if ioption.startswith(("y", "yeah", "yes")):
+            # # Do you you want to save csv files of every structure in the dicom file
+            # while True:  # example of infinite loops using try and except to catch only numbers
+            #     line = input("Do you you want to save csv files of structure "+str(desc_item[k, :])+" in the dicom file? [yes(y)/no(n)]> ")
+            #     try:
+            #         ##        if line == 'done':
+            #         ##            break
+            #         ioption = str(line.lower())
+            #         if ioption.startswith(("y", "yeah", "yes", "n", "no", "nope")):
+            #             break
+            #
+            #     except:  # pylint: disable = bare-except
+            #         print("Please enter a valid option:")
+            # print(str(desc_item[k, 1]))
+            if str(desc_item[k, 1])=='PTV':
+                print('writing')
                 elem = np.transpose(np.vstack((xs_el,ys_el,zs_el)))
-                with open(dirname+"/"+file[0]+"_"+str(desc_item[k,1])+".csv","w+") as my_csv:            # writing the file as my_csv
-                #with open(dirname+"/"+file[0]+"_struct"+str(k)+".csv","w+") as my_csv:            # writing the file as my_csv
+                with open(dirname+"/"+file[0]+"_struct"+str(k)+".csv","w+") as my_csv:            # writing the file as my_csv
                     csvWriter = csv.writer(my_csv,delimiter=',')  # using the csv module to write the file
                     csvWriter.writerow(['x','y','z'])
                     csvWriter.writerows(elem)

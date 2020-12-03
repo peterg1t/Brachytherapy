@@ -80,7 +80,11 @@ def process_directory(directy):
                     except: #pylint: disable = bare-except
                         print("no description found")
                 else:
-                    continue
+                    try:
+                         desc = dataset[0x0008, 0x0060].value
+                    except: #pylint: disable = bare-except
+                        print("no description found")
+                    
 
                 print(
                     "Type=", filetype, "Description=", desc, "Filepath=", directy + file
@@ -90,7 +94,7 @@ def process_directory(directy):
 
 
 parser = argparse.ArgumentParser() #pylint: disable = invalid-name
-parser.add_argument('-d', '--directory', help='path to folder')
+parser.add_argument('directory', help='path to folder')
 args = parser.parse_args() #pylint: disable = invalid-name
 
 if args.directory:

@@ -34,10 +34,8 @@ def process_struct(filename, meas_params, dirname, structname_o):
     print("Starting struct calculation")
     dataset = pydicom.dcmread(filename)
 
-    k = 0
     for elem in dataset[0x3006, 0x0020]:
-        print(elem[0x3006, 0x0028].value, k)
-        k = k + 1
+        print(int(elem[0x3006, 0x0022].value)-1,elem[0x3006, 0x0026].value,elem[0x3006, 0x0028].value)
 
     while True:  # example of infinite loops using try and except to catch only numbers
         line = input("Select the structure to shift > ")
