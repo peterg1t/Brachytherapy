@@ -66,7 +66,7 @@ def process_file(filename):
 
 # Do you you want to save csv files of plan in the dicom file
     while True:  # example of infinite loops using try and except to catch only numbers
-        line = input("Do you you want to save csv files of structure "+str(desc_item[k, :])+" in the dicom file? [yes(y)/no(n)]> ")
+        line = input("Do you you want to save csv files of plan in the dicom file? [yes(y)/no(n)]> ")
         try:
             ##        if line == 'done':
             ##            break
