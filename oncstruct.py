@@ -68,6 +68,7 @@ def process_file(filename):
                 ys_sl = []
                 zs_sl = []
                 for i in range(0, contour[0x3006, 0x0050].VM, 3):
+                    # print(contour[0x3006, 0x0050][i],contour[0x3006, 0x0050][i+1],contour[0x3006, 0x0050][i+2])
                     xs_tot.append(contour[0x3006, 0x0050][i])
                     ys_tot.append(contour[0x3006, 0x0050][i + 1])
                     zs_tot.append(contour[0x3006, 0x0050][i + 2])
@@ -82,9 +83,9 @@ def process_file(filename):
                     layer.append(kk)
                     # print('kk=',kk)
                 kk = kk + 1
-                print('slice=',kk,'x_ave=', np.average(xs_sl))
-                print('slice=',kk,'y_ave=', np.average(ys_sl))
-                print('slice=',kk,'z_ave=', np.average(zs_sl))
+                # print('slice=',kk,'x_ave=', np.average(xs_sl))
+                # print('slice=',kk,'y_ave=', np.average(ys_sl))
+                # print('slice=',kk,'z_ave=', np.average(zs_sl))
 
             # #using matplotlib3d
             # verts = [list(zip(xs_el, ys_el, zs_el))]
@@ -104,9 +105,9 @@ def process_file(filename):
             print('z_ave=',np.average(zs_el))
 
 
-            # Do you you want to save csv files of every structure in the dicom file
+            # Do you you want to save csv files of every structure in the dicom folder
             while True:  # example of infinite loops using try and except to catch only numbers
-                line = input("Do you you want to save csv files of structure "+str(desc_item[k, :])+" in the dicom file? [yes(y)/no(n)]> ")
+                line = input("Do you you want to save csv files of structure "+str(desc_item[k, :])+" in the dicom folder? [yes(y)/no(n)]> ")
                 try:
                     ##        if line == 'done':
                     ##            break

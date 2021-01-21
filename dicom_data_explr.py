@@ -87,7 +87,7 @@ def process_directory(directy):
                     
 
                 print(
-                    "Type=", filetype, "Description=", desc, "Filepath=", directy + file
+                    "Type=", filetype, "Description=", desc, "Filepath=", directy +"/"+ file, "Study",dataset[0x0020, 0x000d].value
                 )
 
 

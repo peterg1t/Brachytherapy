@@ -64,9 +64,9 @@ def process_file(filename):
         ts.append(tw / 100 * source_dataset[i, 2])
         # print('tw=',tw,source_dataset[i,7],source_dataset[i-1,7])
 
-# Do you you want to save csv files of plan in the dicom file
+# Do you you want to save csv files of plan in the dicom folder
     while True:  # example of infinite loops using try and except to catch only numbers
-        line = input("Do you you want to save csv files of plan in the dicom file? [yes(y)/no(n)]> ")
+        line = input("Do you you want to save csv files of plan in the dicom folder? [yes(y)/no(n)]> ")
         try:
             ##        if line == 'done':
             ##            break

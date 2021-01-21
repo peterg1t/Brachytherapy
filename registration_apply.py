@@ -30,54 +30,6 @@ def multi_slice_viewer_axial(volume):
 
 
 
-
-#the data loaded is not in HU we need to rescale it
-# def get_pixels_hu(scans):
-#     image = np.stack([s.pixel_array for s in scans])
-#     # Convert to int16 (from sometimes int16),
-#     # should be possible as values should always be low enough (<32k)
-#     image = image.astype(np.int16)
-#
-#     # Set outside-of-scan pixels to 1
-#     # The intercept is usually -1024, so air is approximately 0
-#     image[image == -2000] = 0
-#
-#     # Convert to Hounsfield units (HU)
-#     intercept = scans[0].RescaleIntercept
-#     slope = scans[0].RescaleSlope
-#
-#     if slope != 1:
-#         image = slope * image.astype(np.float64)
-#         image = image.astype(np.int16)
-#
-#     image += np.int16(intercept)
-#
-#     return np.array(image, dtype=np.int16)
-
-# interpolate the dataset so the spacing is equal in every direction
-# def resample(image, scan, new_spacing=[1, 1, 1]): #this will resample the data to 1mmx1mmx1mm
-#     # Determine current pixel spacing
-#     spacing = map(float, ([scan[0].SliceThickness] + scan[0].PixelSpacing))
-#     spacing = np.array(list(spacing))
-#
-#     resize_factor = spacing / new_spacing
-#     new_real_shape = image.shape * resize_factor
-#     new_shape = np.round(new_real_shape)
-#     real_resize_factor = new_shape / image.shape
-#     new_spacing = spacing / real_resize_factor
-#
-#     image = scipy.ndimage.interpolation.zoom(image, real_resize_factor)
-#
-#     return image, new_spacing
-
-
-
-
-
-
-
-
-
 def process_file(planname,regname,outname,proc_key):
     dataset = pydicom.dcmread(regname, force=True)
 
@@ -90,12 +42,48 @@ def process_file(planname,regname,outname,proc_key):
     M = np.reshape(np.asarray(dataset[0x0070, 0x0308][1][0x0070, 0x0309][0][0x0070, 0x030a][0][0x3006, 0x00c6].value),(4,4))
     Minv = np.linalg.inv(M)
     print(reg_type,M,Minv)
+    
+    
+
 
     dataset2 = pydicom.dcmread(planname, force=True)  # now we load the plan dicom and apply the registration
+
+    # print('Printing the UIDs')
+    list_edit_meta=[(hex(0x0002),hex(0x0003))]
+    list_edit=[(hex(0x0008),hex(0x0018)),(hex(0x0020),hex(0x000e))]
+
+    for item in list_edit_meta:
+        # print(dataset2.file_meta[item].value)
+        tmp_split=str(dataset2.file_meta[item].value).split(sep='.')
+        last_num=int(tmp_split[-1])
+        separator='.'
+        last_num=last_num+1
+        tmp_split.pop(-1)
+        tmp_split.append(str(last_num))
+        updt_num=separator.join(tmp_split)
+        dataset2.file_meta[item].value=updt_num
+        # print(dataset2.file_meta[item].value)
+
+    for item in list_edit:
+        # print(dataset2[item].value)
+        tmp_split=str(dataset2[item].value).split(sep='.')
+        last_num=int(tmp_split[-1])
+        separator='.'
+        last_num=last_num+1
+        tmp_split.pop(-1)
+        tmp_split.append(str(last_num))
+        updt_num=separator.join(tmp_split)
+        dataset2[item].value=updt_num
+        # print(dataset2[item].value)
+
+
+
+
+
     for elem in dataset2[0x300A, 0x0230][0][0x300A, 0x0280]:
         for pos in elem[0x300A, 0x02D0]:
             x, y, z = pos[0x300A, 0x02D4].value
-            print(pos[0x300A, 0x02D4].value)
+            # print(pos[0x300A, 0x02D4].value)
             B=np.asarray([x,y,z,1])
             if proc_key==1:
                 A = np.matmul(Minv,B)
@@ -103,12 +91,13 @@ def process_file(planname,regname,outname,proc_key):
                 A = np.matmul(B,M)
 
             pos[0x300A, 0x02D4].value = [A[0],A[1],A[2]]
-            print(pos[0x300A, 0x02D4].value)
+            # print(pos[0x300A, 0x02D4].value)
 
 
     dirname = os.path.dirname(planname)
     if outname is not None:
         dataset2.save_as(dirname + "/" + outname + ".dcm")  # this is working fine
+        print('Modified plan written to',dirname + "/" + outname + ".dcm")
 
 
 
